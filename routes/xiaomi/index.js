@@ -1,7 +1,7 @@
 const router = require('koa-router')()
 const ut = require('./controller/ut')
 
-router.get('/mi-rank', async (ctx, next) => {
+router.get('/mi-rank', async () => {
   // 热游榜
   let timeArrA = ['yesterday', 'week', 'month']
   let typeArrA = [7]

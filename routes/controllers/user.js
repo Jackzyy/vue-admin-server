@@ -5,39 +5,41 @@ const { tokenVerify } = require('../../utils')
 
 module.exports = class UserController {
   /**
+   * 用户注册
+   * @param {Object} ctx
+   */
+  // static async register(ctx) {}
+
+  /**
    * 用户登陆
    * @param {Object} ctx
    */
   static async login(ctx) {
-    try {
-      let body = ctx.request.body
-      let userInfo = await UserModel.findOne(
-        {
-          user: body.userName,
-          pwd: body.pwd
-        },
-        '-_id user desc'
-      )
-      console.log('aaa')
+    let userName = ctx.checkBody('userName').notEmpty().value
+    let password = ctx.checkBody('pwd').notEmpty().value
 
-      // 登录异常
-      if (!userInfo) throw false
-
-      // 正常登陆
-      let token = await tokenVerify.setToken('admin')
-      ctx.body = {
-        code: 200,
-        msg: '登陆成功',
-        userInfo,
-        token
-      }
-    } catch (error) {
-      ctx.body = {
-        code: 210,
-        msg: '用户名或密码错误'
-      }
-      throw error
+    if (ctx.errors) {
+      ctx.body = ctx.codeMap.refail(null, 10001, ctx.errors)
+      return
     }
+
+    let userInfo = await UserModel.findOne(
+      {
+        user: userName,
+        pwd: password
+      },
+      '-_id user desc'
+    )
+
+    // 登录异常
+    if (!userInfo) {
+      ctx.body = ctx.codeMap.refail('用户名或密码错误')
+      return
+    }
+
+    // 正常登陆
+    let token = await tokenVerify.setToken('admin')
+    ctx.body = ctx.codeMap.resuccess({ userInfo, token })
   }
 
   /**

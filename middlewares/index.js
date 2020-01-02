@@ -1,4 +1,7 @@
+'use strict'
+
 const codeMap = require('./code_map')
+const util = require('../utils')
 
 module.exports = class Middleware {
   static util(ctx, next) {
@@ -10,13 +13,16 @@ module.exports = class Middleware {
     return next().catch(err => {
       if (401 == err.status) {
         ctx.status = 401
-        ctx.body = {
-          status: 401,
-          msg: '登录过期，请重新登录'
-        }
+        ctx.codeMap.refail(null, '401')
       } else {
         throw err
       }
     })
+  }
+
+  static async addUserToCtx(ctx, next) {
+    let token = ctx.headers.authorization
+    if (token) ctx.state.user = await util.tokenVerify.varToken(token)
+    return next()
   }
 }
