@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = {
-  baseFn: require('./baseFn'),
-  singnKey: require('./sign_key'),
+  baseFn: require('./base_fn'),
+  signKey: require('./sign_key'),
   tokenVerify: require('./token_verify')
 }

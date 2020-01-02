@@ -7,9 +7,8 @@ const koa_jwt = require('koa-jwt')
 const validate = require('koa-validate')
 
 const routerConfig = require('./routes/route.config')
-const signKey = require('./utils/sign_key')
 const middleware = require('./middlewares')
-require('./db/db.config')
+const { signKey } = require('./utils')
 
 const app = new Koa()
 
