@@ -26,18 +26,3 @@ const schema = new Schema(
 )
 
 module.exports = mongoose.model('adm_user', schema)
-
-// // 添加超级管理员
-// const admin = new userModel({
-//   user: 'admin',
-//   pwd: 'admin',
-//   desc: 'Super Role'
-// })
-
-// admin.save((err, docs) => {
-//   if (err) {
-//     console.log('添加数据出错')
-//     return
-//   }
-//   console.log(docs)
-// })

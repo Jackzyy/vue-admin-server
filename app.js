@@ -14,14 +14,13 @@ const app = new Koa()
 
 validate(app)
 
-// 中间件 从上往下依次执行
+// middleware
 app
   .use(json())
   .use(logger())
   .use(require('koa-static')(__dirname + '/public'))
   .use(views(__dirname + '/views', { extension: 'pug' }))
   .use(middleware.util)
-  .use(middleware.addUserToCtx)
   .use(middleware.catchAuthorizationErr)
   .use(
     koa_jwt({
@@ -30,7 +29,9 @@ app
       path: ['/api/user/login']
     })
   )
-  .use(bodyparser({ multipart: true }))
+  .use(middleware.addUserToCtx)
+  .use(bodyparser())
+  .use(middleware.validateParams)
   .use(routerConfig.routes(), routerConfig.allowedMethods())
 
 // logger

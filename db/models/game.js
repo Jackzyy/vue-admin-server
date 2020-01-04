@@ -18,7 +18,7 @@ const gameSchema = new Schema(
     tag: String,
     arg: String,
     type: Number,
-    full_detail: Object
+    full_detail: String
   },
   {
     collection: 'mi_rank',

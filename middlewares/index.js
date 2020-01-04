@@ -1,6 +1,7 @@
 'use strict'
 
 const codeMap = require('./code_map')
+const validate = require('./validate')
 const util = require('../utils')
 
 module.exports = class Middleware {
@@ -13,7 +14,7 @@ module.exports = class Middleware {
     return next().catch(err => {
       if (401 == err.status) {
         ctx.status = 401
-        ctx.codeMap.refail(null, '401')
+        ctx.body = ctx.codeMap.refail(null, '401')
       } else {
         throw err
       }
@@ -23,6 +24,11 @@ module.exports = class Middleware {
   static async addUserToCtx(ctx, next) {
     let token = ctx.headers.authorization
     if (token) ctx.state.user = await util.tokenVerify.varToken(token)
+    return next()
+  }
+
+  static async validateParams(ctx, next) {
+    ctx.validate = validate
     return next()
   }
 }

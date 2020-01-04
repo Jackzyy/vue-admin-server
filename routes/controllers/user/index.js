@@ -1,23 +1,55 @@
 'use strict'
 
-const { UserModel } = require('../../db/db.config')
-const { tokenVerify } = require('../../utils')
+const { UserModel } = require('../../../db/db.config')
+const { tokenVerify } = require('../../../utils')
 
 module.exports = class UserController {
   /**
    * 用户注册
    * @param {Object} ctx
    */
-  // static async register(ctx) {}
+  static async register(ctx) {
+    let username = ctx
+      .checkBody('username')
+      .notEmpty()
+      .len(3, 10).value
+    let password = ctx
+      .checkBody('pwd')
+      .notEmpty()
+      .len(6, 10).value
+    let desc = ctx.checkBody('pwd').value
+
+    if (ctx.errors) {
+      ctx.body = ctx.codeMap.refail(null, 10001, ctx.errors)
+      return
+    }
+
+    let result = await UserModel.findOne({ user: username })
+    if (result) {
+      ctx.body = ctx.codeMap.refail('用户名已被使用')
+      return
+    }
+
+    // 添加用户
+    await UserModel.insertMany([
+      {
+        user: username,
+        pwd: password,
+        desc: desc
+      }
+    ])
+    ctx.body = ctx.codeMap.resuccess()
+  }
 
   /**
    * 用户登陆
    * @param {Object} ctx
    */
   static async login(ctx) {
-    let userName = ctx.checkBody('userName').notEmpty().value
-    let password = ctx.checkBody('pwd').notEmpty().value
+    let username = ctx.checkBody('username').notEmpty().value
+    let password = ctx.checkBody('password').notEmpty().value
 
+    // 参数异常
     if (ctx.errors) {
       ctx.body = ctx.codeMap.refail(null, 10001, ctx.errors)
       return
@@ -25,7 +57,7 @@ module.exports = class UserController {
 
     let userInfo = await UserModel.findOne(
       {
-        user: userName,
+        user: username,
         pwd: password
       },
       '-_id user desc'
@@ -48,14 +80,14 @@ module.exports = class UserController {
    */
   static async editPwd(ctx) {
     try {
-      let userName = ctx.state.user.userName
+      let username = ctx.state.user.username
       let body = ctx.request.body
 
       // 更新用户信息
       try {
         let result = await UserModel.findOneAndUpdate(
           {
-            user: userName,
+            user: username,
             pwd: body.oldPwd
           },
           {

@@ -2,18 +2,19 @@
 
 const jwt = require('jsonwebtoken')
 const signKey = require('./sign_key')
+const jwtConfig = require('config').get('jwt')
 
 class verify {
   // 加密生成Token
-  static setToken(userName) {
+  static setToken(username) {
     return new Promise((resolve, reject) => {
       try {
         const token = jwt.sign(
           {
-            userName
+            username
           },
           signKey,
-          { expiresIn: '1h' }
+          { expiresIn: jwtConfig.expire }
         )
         resolve(token)
       } catch (error) {

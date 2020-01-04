@@ -8,8 +8,12 @@ var Schema = mongoose.Schema
  */
 const schema = new Schema(
   {
-    role: String,
-    role_list: Array,
+    role: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    pages: Array,
     desc: String
   },
   {
