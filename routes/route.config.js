@@ -5,7 +5,7 @@ const { db, user, role } = require('./controllers')
 const apiRouter = new router({ prefix: '/api' })
 
 module.exports = apiRouter
-  // 查询测试
+  // DB查询测试
   .get('/db', db.dbQuery)
 
   // 用户
