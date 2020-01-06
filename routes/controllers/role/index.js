@@ -4,12 +4,25 @@ const { RoleModel } = require('../../../db/db.config')
 
 module.exports = class RoleController {
   /**
+   * 禁止修改Admin权限
+   * @param {String} name
+   * @param {Object} ctx
+   */
+  static defendAdmin(name, ctx) {
+    if (name === 'admin') {
+      ctx.body = ctx.codeMap.refail('超级管理员角色禁止编辑！')
+      return false
+    }
+    return true
+  }
+
+  /**
    * 创建角色权限
    * @param {Object} ctx
    */
   static async createRole(ctx) {
-    let role = ctx
-      .checkBody('role')
+    let name = ctx
+      .checkBody('name')
       .notEmpty()
       .len(1, 10).value
     let pages = ctx.checkBody('pages').value
@@ -20,13 +33,13 @@ module.exports = class RoleController {
       return
     }
 
-    let result = await RoleModel.findOne({ role })
+    let result = await RoleModel.findOne({ name })
     if (result) {
       ctx.body = ctx.codeMap.refail('角色已存在')
       return
     }
     await RoleModel.insertMany({
-      role,
+      name,
       pages,
       desc
     })
@@ -38,14 +51,16 @@ module.exports = class RoleController {
    * @param {Object} ctx
    */
   static async delRole(ctx) {
-    let role = ctx.checkBody('role').notEmpty().value
+    let name = ctx.checkBody('name').notEmpty().value
 
     if (ctx.errors) {
       ctx.body = ctx.codeMap.refail(null, '10001', ctx.errors)
       return
     }
 
-    await RoleModel.findOneAndDelete({ role })
+    if (!RoleController.defendAdmin(name, ctx)) return
+
+    await RoleModel.findOneAndDelete({ name })
     ctx.body = ctx.codeMap.resuccess()
   }
 
@@ -54,8 +69,8 @@ module.exports = class RoleController {
    * @param {Object} ctx
    */
   static async editRole(ctx) {
-    let role = ctx
-      .checkBody('role')
+    let name = ctx
+      .checkBody('name')
       .notEmpty()
       .len(1, 10).value
     let pages = ctx.checkBody('pages').value
@@ -66,10 +81,12 @@ module.exports = class RoleController {
       return
     }
 
+    if (!RoleController.defendAdmin(name, ctx)) return
+
     await RoleModel.findOneAndUpdate(
-      { role },
+      { name },
       {
-        role,
+        name,
         pages,
         desc
       },
@@ -81,19 +98,11 @@ module.exports = class RoleController {
   }
 
   /**
-   * 查询角色权限
+   * 查询用户角色权限
    * @param {Object} ctx
    */
   static async queryRole(ctx) {
-    let role = ctx.checkBody('role').notEmpty().value
-
-    if (ctx.errors) {
-      ctx.body = ctx.codeMap.refail(null, '10001', ctx.errors)
-      return
-    }
-
-    let roleInfo = await RoleModel.findOne({ role })
+    let roleInfo = await RoleModel.find({}, 'name pages').limit(20)
     ctx.body = ctx.codeMap.resuccess(roleInfo)
   }
 }
-

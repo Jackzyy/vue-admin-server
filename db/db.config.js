@@ -12,6 +12,6 @@ mongoose.connect(dbConfig.dbUrl, dbConfig.options, err => {
 
 module.exports = {
   UserModel: require('./models/user'),
-  GameModel: require('./models/game'),
+  GameModel: require('./models/rank'),
   RoleModel: require('./models/role')
 }

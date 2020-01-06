@@ -1,7 +1,7 @@
 'use strict'
 
 const codeMap = require('./code_map')
-const validate = require('./validate')
+const validate = require('./validator')
 const util = require('../utils')
 
 module.exports = class Middleware {

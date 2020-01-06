@@ -26,12 +26,12 @@ app
     koa_jwt({
       secret: signKey
     }).unless({
-      path: ['/api/user/login']
+      path: ['/api/user/login', '/api/user/register']
     })
   )
   .use(middleware.addUserToCtx)
   .use(bodyparser())
-  .use(middleware.validateParams)
+  // .use(middleware.validateParams)
   .use(routerConfig.routes(), routerConfig.allowedMethods())
 
 // logger

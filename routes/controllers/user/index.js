@@ -16,7 +16,7 @@ module.exports = class UserController {
     let password = ctx
       .checkBody('pwd')
       .notEmpty()
-      .len(6, 10).value
+      .len(5, 10).value
     let desc = ctx.checkBody('pwd').value
 
     if (ctx.errors) {
@@ -79,37 +79,83 @@ module.exports = class UserController {
    * @param {Object} ctx
    */
   static async editPwd(ctx) {
-    try {
-      let username = ctx.state.user.username
-      let body = ctx.request.body
+    let username = ctx.checkBody('username').notEmpty().value
+    let oldPwd = ctx.checkBody('oldPwd').notEmpty().value
+    let newPwd = ctx
+      .checkBody('newPwd')
+      .notEmpty()
+      .len(5, 10).value
 
-      // 更新用户信息
-      try {
-        let result = await UserModel.findOneAndUpdate(
-          {
-            user: username,
-            pwd: body.oldPwd
-          },
-          {
-            pwd: body.newPwd
-          },
-          { new: true }
-        )
-
-        // 失败向外层抛出异常
-        if (!result) throw false
-      } catch (error) {
-        throw new Error(error)
-      }
-
-      ctx.body = {
-        code: 200,
-        msg: '密码更新成功'
-      }
-    } catch (error) {
-      ctx.body = {
-        msg: '密码更新失败'
-      }
+    // 参数异常
+    if (ctx.errors) {
+      ctx.body = ctx.codeMap.refail(null, '10001', ctx.errors)
+      return
     }
+
+    // 更新用户信息
+    try {
+      let result = await UserModel.findOneAndUpdate(
+        {
+          user: username,
+          pwd: oldPwd
+        },
+        {
+          pwd: newPwd
+        },
+        { new: true }
+      )
+
+      if (!result) throw new Error()
+      ctx.body = ctx.codeMap.resuccess()
+    } catch (error) {
+      ctx.body = ctx.codeMap.refail()
+    }
+  }
+
+  /**
+   * 编辑用户角色信息
+   * @param {Object} ctx
+   */
+  static async editUserRole(ctx) {
+    let username = ctx.state.user.username
+    let id = ctx.checkBody('_id').notEmpty().value
+
+    // 参数异常
+    if (ctx.errors) {
+      ctx.body = ctx.codeMap.refail(null, '10001', ctx.errors)
+      return
+    }
+
+    try {
+      await UserModel.findOneAndUpdate(
+        {
+          name: username
+        },
+        {
+          role: id
+        },
+        { new: true }
+      )
+
+      ctx.body = ctx.codeMap.resuccess()
+    } catch (error) {
+      ctx.body = ctx.codeMap.refail()
+    }
+  }
+
+   /**
+   * 查询用户角色权限
+   * @param {Object} ctx
+   */
+  static async queryRole(ctx) {
+    let username = ctx.state.user.username
+    let roleInfo = await UserModel.findOne(
+      {
+        user: username
+      },
+      '-_id user'
+    ).populate('role', 'name pages desc')
+
+    ctx.body = ctx.codeMap.resuccess(roleInfo)
   }
 }

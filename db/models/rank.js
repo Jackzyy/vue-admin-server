@@ -8,7 +8,7 @@ var Schema = mongoose.Schema
  * @tag 游戏标签
  * @arg 数据时间范围 yesterday：昨天， week：一周，all：30天
  * @type 游戏分类 0：热游榜， 1：评分榜， 2：爆肝榜
- * @full_detail 爬取的Json
+ * @full_detail 单项JSON具体数据
  */
 const gameSchema = new Schema(
   {
@@ -18,7 +18,7 @@ const gameSchema = new Schema(
     tag: String,
     arg: String,
     type: Number,
-    full_detail: String
+    full_detail: Schema.Types.Mixed
   },
   {
     collection: 'mi_rank',

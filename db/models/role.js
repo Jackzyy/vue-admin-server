@@ -8,7 +8,7 @@ var Schema = mongoose.Schema
  */
 const schema = new Schema(
   {
-    role: {
+    name: {
       type: String,
       required: true,
       unique: true

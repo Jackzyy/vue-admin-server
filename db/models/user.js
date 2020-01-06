@@ -16,6 +16,10 @@ const schema = new Schema(
       type: String,
       required: true
     },
+    role:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'adm_role'
+    },
     desc: String
   },
   {
